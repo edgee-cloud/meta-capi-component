@@ -1,0 +1,16 @@
+[package]
+name = "meta-capi-component"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+anyhow = "1.0.86"
+chrono = { version = "0.4.38", features = ["serde"] }
+serde = { version = "1.0.204", features = ["derive"] }
+serde_json = "1.0.120"
+sha2 = "0.10.8"
+url = "2.5.3"
+wit-bindgen = "0.34.0" 
