@@ -52,8 +52,7 @@ impl MetaPayload {
 /// To know more about the event structure, check the online documentation: https://developers.facebook.com/docs/marketing-api/conversions-api/parameters/server-event
 ///
 /// There are three ways of tracking conversions using this component:
-/// - Standard events, which are user actions that we've defined and that you record by calling a `track`event.
-/// To know more about the standard event list, please visit this documentation https://developers.facebook.com/docs/meta-pixel/reference#standard-events
+/// - Standard events, which are user actions that we've defined and that you record by calling a `track`event. To know more about the standard event list, please visit this documentation https://developers.facebook.com/docs/meta-pixel/reference#standard-events
 /// - Personalized events, which are user actions defined by you and recorded by calling by calling a `track`event with a custom event name.
 /// - Personalized conversions, which are visitor actions that are automatically tracked by analyzing your website's referring URLs.
 #[derive(Serialize, Debug)]
@@ -140,11 +139,11 @@ impl MetaEvent {
         }
 
         // Set user data
-        let mut user_data = UserData::default();
-
-        // Set client IP and user agent
-        user_data.client_ip_address = Some(edgee_event.context.client.ip.clone());
-        user_data.client_user_agent = Some(edgee_event.context.client.user_agent.clone());
+        let mut user_data = UserData {
+            client_ip_address: Some(edgee_event.context.client.ip.clone()),
+            client_user_agent: Some(edgee_event.context.client.user_agent.clone()),
+            ..UserData::default()
+        };
 
         // Set user IDs
         if !edgee_event.context.user.user_id.is_empty() {
@@ -199,7 +198,7 @@ pub(crate) fn parse_value(value: &str) -> serde_json::Value {
         serde_json::Value::from(true)
     } else if value == "false" {
         serde_json::Value::from(false)
-    } else if let Some(_v) = value.parse::<f64>().ok() {
+    } else if value.parse::<f64>().is_ok() {
         serde_json::Value::Number(value.parse().unwrap())
     } else {
         serde_json::Value::String(value.to_string())
