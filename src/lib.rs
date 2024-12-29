@@ -89,11 +89,10 @@ impl Guest for MetaComponent {
 }
 
 fn build_edgee_request(meta_payload: MetaPayload) -> EdgeeRequest {
-    let mut headers = vec![];
-    headers.push((
+    let headers = vec![(
         String::from("content-type"),
         String::from("application/json"),
-    ));
+    )];
 
     let url = format!(
         "https://graph.facebook.com/v17.0/{}/events?access_token={}",
