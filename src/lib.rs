@@ -2,7 +2,9 @@ mod meta_payload;
 
 use std::collections::HashMap;
 
-use crate::exports::edgee::protocols::provider::{Data, Dict, EdgeeRequest, Event, Guest, HttpMethod};
+use crate::exports::edgee::protocols::provider::{
+    Data, Dict, EdgeeRequest, Event, Guest, HttpMethod,
+};
 use meta_payload::{parse_value, MetaEvent, MetaPayload};
 
 wit_bindgen::generate!({world: "data-collection", path: "wit", with: { "edgee:protocols/provider": generate }});
@@ -14,15 +16,13 @@ struct MetaComponent;
 impl Guest for MetaComponent {
     fn page(edgee_event: Event, cred_map: Dict) -> Result<EdgeeRequest, String> {
         if let Data::Page(ref data) = edgee_event.data {
-            let mut meta_payload = MetaPayload::new(cred_map)
-                .map_err(|e| e.to_string())?;
-            
-            let mut event = MetaEvent::new(&edgee_event, "PageView")
-                .map_err(|e| e.to_string())?;
+            let mut meta_payload = MetaPayload::new(cred_map).map_err(|e| e.to_string())?;
+
+            let mut event = MetaEvent::new(&edgee_event, "PageView").map_err(|e| e.to_string())?;
 
             // Create custom data
             let mut custom_data: HashMap<String, serde_json::Value> = HashMap::new();
-            
+
             if !data.name.is_empty() {
                 custom_data.insert("page_name".to_string(), parse_value(&data.name));
             }
@@ -54,8 +54,8 @@ impl Guest for MetaComponent {
             }
 
             let mut meta_payload = MetaPayload::new(cred_map).map_err(|e| e.to_string())?;
-            let mut event = MetaEvent::new(&edgee_event, data.name.as_str()).map_err(|e| e.to_string())?;
-
+            let mut event =
+                MetaEvent::new(&edgee_event, data.name.as_str()).map_err(|e| e.to_string())?;
 
             // Create custom data from properties
             let mut custom_data: HashMap<String, serde_json::Value> = HashMap::new();
@@ -97,8 +97,7 @@ fn build_edgee_request(meta_payload: MetaPayload) -> EdgeeRequest {
 
     let url = format!(
         "https://graph.facebook.com/v17.0/{}/events?access_token={}",
-        meta_payload.pixel_id, 
-        meta_payload.access_token
+        meta_payload.pixel_id, meta_payload.access_token
     );
 
     let url = if let Some(test_code) = meta_payload.test_event_code.clone() {
