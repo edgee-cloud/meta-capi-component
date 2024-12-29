@@ -29,9 +29,9 @@ Here is the mapping between Edgee events and GA events:
 |-------------|-----------|
 | Page   | `PageView`     |
 | Track  | Name of the event |
-| User   | `UserIdentification` |
+| User   | `Lead` |
 
-Each time you make a `user` call, Edgee will send an `UserIdentification` event to Meta CAPI.
+Each time you make a `user` call, Edgee will send an `Lead` event to Meta CAPI.
 
 But when you make a `user` call using Edgee's JS library or Data Layer, the `user_id`, `anonymous_id` and `properties` are stored in the user's device.
 This allows the user's data to be added to any subsequent page or follow-up calls for the user, so that you can correctly attribute these actions.
