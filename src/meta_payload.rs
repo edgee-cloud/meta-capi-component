@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use serde::Serialize;
+use sha2::{Digest, Sha256};
 use std::collections::HashMap;
-use sha2::{Sha256, Digest};
 
 use crate::exports::edgee::protocols::provider::{Dict, Event};
 
@@ -44,15 +44,15 @@ impl MetaPayload {
             test_event_code,
         })
     }
-} 
+}
 
 /// Meta Event
-/// 
+///
 /// This is the event that will be sent to Meta CAPI.
 /// To know more about the event structure, check the online documentation: https://developers.facebook.com/docs/marketing-api/conversions-api/parameters/server-event
-/// 
+///
 /// There are three ways of tracking conversions using this component:
-/// - Standard events, which are user actions that we've defined and that you record by calling a `track`event. 
+/// - Standard events, which are user actions that we've defined and that you record by calling a `track`event.
 /// To know more about the standard event list, please visit this documentation https://developers.facebook.com/docs/meta-pixel/reference#standard-events
 /// - Personalized events, which are user actions defined by you and recorded by calling by calling a `track`event with a custom event name.
 /// - Personalized conversions, which are visitor actions that are automatically tracked by analyzing your website's referring URLs.
@@ -72,13 +72,13 @@ pub struct MetaEvent {
 }
 
 // User Data
-// 
+//
 // This is the user data that will be sent to Meta CAPI.
 // To know more about the user data structure, check the online documentation: https://developers.facebook.com/docs/marketing-api/conversions-api/parameters/customer-information-parameters
 #[derive(Serialize, Debug, Default)]
 pub struct UserData {
     #[serde(rename = "em", skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>, // hashed email SHA256   
+    pub email: Option<String>, // hashed email SHA256
     #[serde(rename = "ph", skip_serializing_if = "Option::is_none")]
     pub phone_number: Option<String>, // hashed phone number SHA256
     #[serde(rename = "fn", skip_serializing_if = "Option::is_none")]
@@ -112,7 +112,6 @@ pub struct UserData {
 
 impl MetaEvent {
     pub fn new(edgee_event: &Event, event_name: &str) -> anyhow::Result<Self> {
-    
         // Default meta event
         let mut meta_event = MetaEvent {
             event_name: event_name.to_string(),
@@ -142,11 +141,11 @@ impl MetaEvent {
 
         // Set user data
         let mut user_data = UserData::default();
-        
+
         // Set client IP and user agent
         user_data.client_ip_address = Some(edgee_event.context.client.ip.clone());
         user_data.client_user_agent = Some(edgee_event.context.client.user_agent.clone());
-        
+
         // Set user IDs
         if !edgee_event.context.user.user_id.is_empty() {
             user_data.external_id = Some(vec![edgee_event.context.user.user_id.clone()]);
@@ -179,7 +178,9 @@ impl MetaEvent {
 
         // return error if user data doesn't have any user property
         if user_data.email.is_none() && user_data.phone_number.is_none() {
-            return Err(anyhow!("User properties must contain email or phone_number"));
+            return Err(anyhow!(
+                "User properties must contain email or phone_number"
+            ));
         }
 
         meta_event.user_data = user_data;
@@ -189,7 +190,7 @@ impl MetaEvent {
 }
 
 /// Parse value
-/// 
+///
 /// This function is used to parse the value of a property.
 /// It converts the value to a JSON value.
 /// TODO: add object and array support
@@ -206,7 +207,7 @@ pub(crate) fn parse_value(value: &str) -> serde_json::Value {
 }
 
 /// SHA256 hash value
-/// 
+///
 /// This function is used to hash the value.
 pub(crate) fn hash_value(input: &str) -> String {
     let mut hasher = Sha256::new();
