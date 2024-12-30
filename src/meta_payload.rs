@@ -3,7 +3,7 @@ use serde::Serialize;
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 
-use crate::exports::edgee::protocols::provider::{Dict, Event};
+use crate::exports::edgee::protocols::provider::{Data, Dict, Event};
 
 #[derive(Serialize, Debug, Default)]
 pub(crate) struct MetaPayload {
@@ -98,7 +98,7 @@ pub struct UserData {
     pub country: Option<String>, // hashed
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub external_id: Option<Vec<String>>,
+    pub external_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub client_ip_address: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -147,17 +147,22 @@ impl MetaEvent {
 
         // Set user IDs
         if !edgee_event.context.user.user_id.is_empty() {
-            user_data.external_id = Some(vec![edgee_event.context.user.user_id.clone()]);
+            user_data.external_id = Some(hash_value(&edgee_event.context.user.user_id));
+        }
+
+        let mut user_properties = edgee_event.context.user.properties.clone();
+        if let Data::User(ref data) = edgee_event.data {
+            user_properties = data.properties.clone();
         }
 
         // user properties
         // You must provide at least one of the following user property.
-        if edgee_event.context.user.properties.is_empty() {
+        if user_properties.is_empty() {
             return Err(anyhow!("User properties are empty"));
         }
 
         // Set user properties
-        for (key, value) in edgee_event.context.user.properties.iter() {
+        for (key, value) in user_properties.iter() {
             match key.as_str() {
                 "email" => user_data.email = Some(hash_value(value)),
                 "phone_number" => user_data.phone_number = Some(hash_value(value)),
