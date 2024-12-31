@@ -1,40 +1,51 @@
 <div align="center">
-
 <p align="center">
   <a href="https://www.edgee.cloud">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://cdn.edgee.cloud/img/favicon-dark.svg">
-      <img src="https://cdn.edgee.cloud/img/favicon.svg" height="100" alt="Edgee">
+      <source media="(prefers-color-scheme: dark)" srcset="https://cdn.edgee.cloud/img/component-dark.svg">
+      <img src="https://cdn.edgee.cloud/img/component.svg" height="100" alt="Edgee">
     </picture>
-    <h1 align="center">Edgee</h1>
   </a>
 </p>
-
-
-**The full-stack edge platform for your edge oriented applications.**
-
-[![Edgee](https://img.shields.io/badge/edgee-open%20source-blueviolet.svg)](https://www.edgee.cloud)
-[![Edgee](https://img.shields.io/badge/slack-edgee-blueviolet.svg?logo=slack)](https://www.edgee.cloud/slack)
-[![Docs](https://img.shields.io/badge/docs-published-blue)](https://docs.edgee.cloud)
-
 </div>
 
-This component implements the data collection protocol between [Meta CAPI](https://developers.facebook.com/docs/marketing-api/conversions-api/) and [Edgee](https://www.edgee.cloud).
 
-### Event mapping:
+<h1 align="center">Meta CAPI Component for Edgee</h1>
 
-Here is the mapping between Edgee events and GA events:
+This component implements the data collection protocol between [Edgee](https://www.edgee.cloud) and [Meta CAPI](https://developers.facebook.com/docs/marketing-api/conversions-api/).
 
-| Edgee event | GA Event  |
-|-------------|-----------|
-| Page   | `PageView`     |
-| Track  | Name of the event |
-| User   | `Lead` |
+## Quick Start
 
-Each time you make a `user` call, Edgee will send an `Lead` event to Meta CAPI.
+1. Download the latest component version from our [releases page](../../releases)
+2. Place the `meta_capi.wasm` file in your server (e.g., `/var/edgee/components`)
+3. Add the following configuration to your `edgee.toml`:
 
-But when you make a `user` call using Edgee's JS library or Data Layer, the `user_id`, `anonymous_id` and `properties` are stored in the user's device.
-This allows the user's data to be added to any subsequent page or follow-up calls for the user, so that you can correctly attribute these actions.
+```toml
+[[destinations.data_collection]]
+name = "meta_capi"
+component = "/var/edgee/components/meta_capi.wasm"
+credentials.meta_access_token = "YOUR_ACCESS_TOKEN"
+credentials.meta_pixel_id = "YOUR_PIXEL_ID"
+credentials.meta_test_event_code = "TEST_EVENT_CODE" # Optional
+```
+
+## Event Handling
+
+### Event Mapping
+The component maps Edgee events to Meta CAPI events as follows:
+
+| Edgee event | Meta CAPI Event  | Description |
+|-------------|-----------|-------------|
+| Page   | `PageView`     | Triggered when a user views a page |
+| Track  | Name of the event | Uses the provided event name directly |
+| User   | `Lead` | Used for lead identification |
+
+### User Event Handling
+User events in Meta CAPI serve multiple purposes:
+- Triggers an `Lead` call to Meta CAPI
+- Stores `user_id`, `anonymous_id`, and `properties` on the user's device
+- Enriches subsequent Page and Track events with user data
+- Enables proper user attribution across sessions
 
 **BE CAREFUL:**
 Meta Conversions API is designed to create a connection between an advertiser’s marketing data (such as website events) and Meta systems that optimize ad targeting, decrease cost per result and measure outcomes.
@@ -50,11 +61,9 @@ edgee.user({
 });
 ```
 
-## Usage
+## Configuration Options
 
-- Download the latest version in our [releases page](../../releases). 
-- Place the wasm file in a known place in your server (e.g. `/var/edgee/components`).
-- Update your edgee proxy config:
+### Basic Configuration
 ```toml
 [[destinations.data_collection]]
 name = "meta_capi"
@@ -62,26 +71,61 @@ component = "/var/edgee/components/meta_capi.wasm"
 credentials.meta_access_token = "YOUR_ACCESS_TOKEN"
 credentials.meta_pixel_id = "YOUR_PIXEL_ID"
 credentials.meta_test_event_code = "TEST_EVENT_CODE" # Optional
+
+# Optional configurations
+config.default_consent = "pending" # Set default consent status
 ```
 
-To know how to get the access token and pixel id, please refer to the [Meta CAPI documentation](https://developers.facebook.com/docs/marketing-api/conversions-api/get-started).
+### Event Controls
+Control which events are forwarded to Meta CAPI:
+```toml
+config.page_event_enabled = true   # Enable/disable page view tracking
+config.track_event_enabled = true  # Enable/disable custom event tracking
+config.user_event_enabled = true   # Enable/disable user identification
+```
 
-## Contributing
-If you're interested in contributing to Edgee, read our [contribution guidelines](./CONTRIBUTING.md)
+### Consent Management
+Before sending events to Meta CAPI, you can set the user consent using the Edgee SDK: 
+```javascript
+edgee.consent("granted");
+```
 
-## Reporting Security Vulnerabilities
-If you've found a vulnerability or potential vulnerability in our code, please let us know at
-[edgee-security](mailto:security@edgee.cloud).
+Or using the Data Layer:
+```html
+<script id="__EDGEE_DATA_LAYER__" type="application/json">
+  {
+    "data_collection": {
+      "consent": "granted"
+    }
+  }
+</script>
+```
 
-## Building from source
+If the consent is not set, the component will use the default consent status.
+**Important:** Meta CAPI requires the consent status to be set to `granted`. If not, the events will be ignored.
 
-To build the wasm file from source, you need to have installed 
+| Consent | Events |
+|---------|--------|
+| pending | ignored |
+| denied  | ignored |
+| granted | forwarded |
+
+## Development
+
+### Building from Source
+Prerequisites:
 - [Rust](https://www.rust-lang.org/tools/install)
-- `wasm32-wasip2` target: run `rustup target add wasm32-wasip2`
-- `wasm-tools`: run `cargo install --locked wasm-tools`
+- WASM target: `rustup target add wasm32-wasip2`
+- wit-deps: `cargo install wit-deps`
 
-Then you can run the following commands:
-
+Build command:
 ```bash
 make build
+```
+
+### Contributing
+Interested in contributing? Read our [contribution guidelines](./CONTRIBUTING.md)
+
+### Security
+Report security vulnerabilities to [security@edgee.cloud](mailto:security@edgee.cloud)
 ```
