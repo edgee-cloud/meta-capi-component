@@ -3,7 +3,7 @@ use serde::Serialize;
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 
-use crate::exports::edgee::protocols::provider::{Data, Dict, Event};
+use crate::exports::edgee::protocols::provider::{Consent, Data, Dict, Event};
 
 #[derive(Serialize, Debug, Default)]
 pub(crate) struct MetaPayload {
@@ -153,6 +153,11 @@ impl MetaEvent {
         let mut user_properties = edgee_event.context.user.properties.clone();
         if let Data::User(ref data) = edgee_event.data {
             user_properties = data.properties.clone();
+        }
+
+        if edgee_event.consent.is_some() && edgee_event.consent.unwrap() != Consent::Granted {
+            // Consent is not granted, so we don't send the event
+            return Err(anyhow!("Consent is not granted"));
         }
 
         // user properties
