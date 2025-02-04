@@ -21,12 +21,12 @@ This component implements the data collection protocol between [Edgee](https://w
 3. Add the following configuration to your `edgee.toml`:
 
 ```toml
-[[destinations.data_collection]]
-name = "meta_capi"
-component = "/var/edgee/components/meta_capi.wasm"
-credentials.meta_access_token = "YOUR_ACCESS_TOKEN"
-credentials.meta_pixel_id = "YOUR_PIXEL_ID"
-credentials.meta_test_event_code = "TEST_EVENT_CODE" # Optional
+[[components.data_collection]]
+id = "meta_capi"
+file = "/var/edgee/components/meta_capi.wasm"
+settings.meta_access_token = "YOUR_ACCESS_TOKEN"
+settings.meta_pixel_id = "YOUR_PIXEL_ID"
+settings.meta_test_event_code = "TEST_EVENT_CODE" # Optional
 ```
 
 ## Event Handling
@@ -65,23 +65,23 @@ edgee.user({
 
 ### Basic Configuration
 ```toml
-[[destinations.data_collection]]
-name = "meta_capi"
-component = "/var/edgee/components/meta_capi.wasm"
-credentials.meta_access_token = "YOUR_ACCESS_TOKEN"
-credentials.meta_pixel_id = "YOUR_PIXEL_ID"
-credentials.meta_test_event_code = "TEST_EVENT_CODE" # Optional
+[[components.data_collection]]
+id = "meta_capi"
+file = "/var/edgee/components/meta_capi.wasm"
+settings.meta_access_token = "YOUR_ACCESS_TOKEN"
+settings.meta_pixel_id = "YOUR_PIXEL_ID"
+settings.meta_test_event_code = "TEST_EVENT_CODE" # Optional
 
 # Optional configurations
-config.default_consent = "pending" # Set default consent status
+settings.edgee_default_consent = "pending" # Set default consent status
 ```
 
 ### Event Controls
 Control which events are forwarded to Meta CAPI:
 ```toml
-config.page_event_enabled = true   # Enable/disable page view tracking
-config.track_event_enabled = true  # Enable/disable custom event tracking
-config.user_event_enabled = true   # Enable/disable user identification
+settings.edgee_page_event_enabled = true   # Enable/disable page view tracking
+settings.edgee_track_event_enabled = true  # Enable/disable custom event tracking
+settings.edgee_user_event_enabled = true   # Enable/disable user identification
 ```
 
 ### Consent Management
