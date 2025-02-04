@@ -14,9 +14,9 @@ export!(MetaComponent);
 struct MetaComponent;
 
 impl Guest for MetaComponent {
-    fn page(edgee_event: Event, cred_map: Dict) -> Result<EdgeeRequest, String> {
+    fn page(edgee_event: Event, settings: Dict) -> Result<EdgeeRequest, String> {
         if let Data::Page(ref data) = edgee_event.data {
-            let mut meta_payload = MetaPayload::new(cred_map).map_err(|e| e.to_string())?;
+            let mut meta_payload = MetaPayload::new(settings).map_err(|e| e.to_string())?;
 
             let mut event = MetaEvent::new(&edgee_event, "PageView").map_err(|e| e.to_string())?;
 
@@ -47,13 +47,13 @@ impl Guest for MetaComponent {
         }
     }
 
-    fn track(edgee_event: Event, cred_map: Dict) -> Result<EdgeeRequest, String> {
+    fn track(edgee_event: Event, settings: Dict) -> Result<EdgeeRequest, String> {
         if let Data::Track(ref data) = edgee_event.data {
             if data.name.is_empty() {
                 return Err("Track name is not set".to_string());
             }
 
-            let mut meta_payload = MetaPayload::new(cred_map).map_err(|e| e.to_string())?;
+            let mut meta_payload = MetaPayload::new(settings).map_err(|e| e.to_string())?;
             let mut event =
                 MetaEvent::new(&edgee_event, data.name.as_str()).map_err(|e| e.to_string())?;
 
@@ -71,13 +71,13 @@ impl Guest for MetaComponent {
         }
     }
 
-    fn user(edgee_event: Event, cred_map: Dict) -> Result<EdgeeRequest, String> {
+    fn user(edgee_event: Event, settings: Dict) -> Result<EdgeeRequest, String> {
         if let Data::User(ref data) = edgee_event.data {
             if data.user_id.is_empty() && data.anonymous_id.is_empty() {
                 return Err("user_id or anonymous_id is not set".to_string());
             }
 
-            let mut meta_payload = MetaPayload::new(cred_map).map_err(|e| e.to_string())?;
+            let mut meta_payload = MetaPayload::new(settings).map_err(|e| e.to_string())?;
             let event = MetaEvent::new(&edgee_event, "Lead").map_err(|e| e.to_string())?;
             meta_payload.data.push(event);
 
@@ -109,6 +109,7 @@ fn build_edgee_request(meta_payload: MetaPayload) -> EdgeeRequest {
         method: HttpMethod::Post,
         url,
         headers,
+        forward_client_headers: true,
         body: serde_json::to_string(&meta_payload).unwrap(),
     }
 }
@@ -346,14 +347,14 @@ mod tests {
         }
     }
 
-    fn sample_credentials() -> Vec<(String, String)> {
+    fn sample_settings() -> Vec<(String, String)> {
         vec![
             ("meta_access_token".to_string(), "abc".to_string()),
             ("meta_pixel_id".to_string(), "abc".to_string()),
         ]
     }
 
-    fn sample_credentials_with_test_code() -> Vec<(String, String)> {
+    fn sample_settings_with_test_code() -> Vec<(String, String)> {
         vec![
             ("meta_access_token".to_string(), "abc".to_string()),
             ("meta_pixel_id".to_string(), "abc".to_string()),
@@ -369,8 +370,8 @@ mod tests {
             "fr".to_string(),
             true,
         );
-        let credentials = sample_credentials();
-        let result = MetaComponent::page(event, credentials);
+        let settings = sample_settings();
+        let result = MetaComponent::page(event, settings);
 
         assert_eq!(result.is_err(), false);
         let edgee_request = result.unwrap();
@@ -391,8 +392,8 @@ mod tests {
             "fr".to_string(),
             true,
         );
-        let credentials = sample_credentials();
-        let result = MetaComponent::page(event, credentials);
+        let settings = sample_settings();
+        let result = MetaComponent::page(event, settings);
 
         assert_eq!(result.is_err(), false);
         let edgee_request = result.unwrap();
@@ -408,8 +409,8 @@ mod tests {
             "fr".to_string(),
             true,
         );
-        let credentials = sample_credentials();
-        let result = MetaComponent::page(event, credentials);
+        let settings = sample_settings();
+        let result = MetaComponent::page(event, settings);
 
         assert_eq!(result.is_err(), true);
         assert_eq!(
@@ -426,8 +427,8 @@ mod tests {
     #[test]
     fn page_with_edgee_id_uuid() {
         let event = sample_page_event(None, Uuid::new_v4().to_string(), "fr".to_string(), true);
-        let credentials = sample_credentials();
-        let result = MetaComponent::page(event, credentials);
+        let settings = sample_settings();
+        let result = MetaComponent::page(event, settings);
 
         assert_eq!(result.is_err(), false);
         let edgee_request = result.unwrap();
@@ -439,8 +440,8 @@ mod tests {
     fn page_with_empty_locale() {
         let event = sample_page_event(None, Uuid::new_v4().to_string(), "".to_string(), true);
 
-        let credentials = sample_credentials();
-        let result = MetaComponent::page(event, credentials);
+        let settings = sample_settings();
+        let result = MetaComponent::page(event, settings);
 
         assert_eq!(result.is_err(), false);
         let edgee_request = result.unwrap();
@@ -451,8 +452,8 @@ mod tests {
     #[test]
     fn page_not_session_start() {
         let event = sample_page_event(None, Uuid::new_v4().to_string(), "".to_string(), false);
-        let credentials = sample_credentials();
-        let result = MetaComponent::page(event, credentials);
+        let settings = sample_settings();
+        let result = MetaComponent::page(event, settings);
 
         assert_eq!(result.is_err(), false);
         let edgee_request = result.unwrap();
@@ -463,18 +464,18 @@ mod tests {
     #[test]
     fn page_without_access_token_fails() {
         let event = sample_page_event(None, "abc".to_string(), "fr".to_string(), true);
-        let credentials: Vec<(String, String)> = vec![]; // empty
-        let result = MetaComponent::page(event, credentials); // this should panic!
+        let settings: Vec<(String, String)> = vec![]; // empty
+        let result = MetaComponent::page(event, settings); // this should panic!
         assert_eq!(result.is_err(), true);
     }
 
     #[test]
     fn page_without_pixel_id_fails() {
         let event = sample_page_event(None, "abc".to_string(), "fr".to_string(), true);
-        let credentials: Vec<(String, String)> = vec![
+        let settings: Vec<(String, String)> = vec![
             ("meta_access_token".to_string(), "abc".to_string()), // only access token
         ];
-        let result = MetaComponent::page(event, credentials); // this should panic!
+        let result = MetaComponent::page(event, settings); // this should panic!
         assert_eq!(result.is_err(), true);
     }
 
@@ -487,8 +488,8 @@ mod tests {
             "fr".to_string(),
             true,
         );
-        let credentials = sample_credentials();
-        let result = MetaComponent::track(event, credentials);
+        let settings = sample_settings();
+        let result = MetaComponent::track(event, settings);
         assert_eq!(result.clone().is_err(), false);
         let edgee_request = result.unwrap();
         assert_eq!(edgee_request.method, HttpMethod::Post);
@@ -504,8 +505,8 @@ mod tests {
             "fr".to_string(),
             true,
         );
-        let credentials = sample_credentials();
-        let result = MetaComponent::track(event, credentials);
+        let settings = sample_settings();
+        let result = MetaComponent::track(event, settings);
         assert_eq!(result.is_err(), true);
     }
 
@@ -517,8 +518,8 @@ mod tests {
             "fr".to_string(),
             true,
         );
-        let credentials = sample_credentials();
-        let result = MetaComponent::user(event, credentials);
+        let settings = sample_settings();
+        let result = MetaComponent::user(event, settings);
 
         assert_eq!(result.clone().is_err(), false);
     }
@@ -531,8 +532,8 @@ mod tests {
             "fr".to_string(),
             true,
         );
-        let credentials = sample_credentials_with_test_code();
-        let result = MetaComponent::user(event, credentials);
+        let settings = sample_settings_with_test_code();
+        let result = MetaComponent::user(event, settings);
 
         assert_eq!(result.clone().is_err(), false);
         let edgee_request = result.unwrap();
@@ -547,8 +548,8 @@ mod tests {
             "fr".to_string(),
             true,
         );
-        let credentials = sample_credentials();
-        let result = MetaComponent::user(event, credentials);
+        let settings = sample_settings();
+        let result = MetaComponent::user(event, settings);
 
         assert_eq!(result.clone().is_err(), true);
         assert_eq!(
@@ -570,8 +571,8 @@ mod tests {
             "fr".to_string(),
             true,
         );
-        let credentials = sample_credentials();
-        let result = MetaComponent::user(event, credentials);
+        let settings = sample_settings();
+        let result = MetaComponent::user(event, settings);
 
         assert_eq!(result.clone().is_err(), true);
         assert_eq!(
@@ -596,8 +597,8 @@ mod tests {
         );
         event.context.user.properties = vec![]; // empty context user properties
         event.context.user.user_id = "".to_string(); // empty context user id
-        let credentials = sample_credentials();
-        let result = MetaComponent::track(event, credentials);
+        let settings = sample_settings();
+        let result = MetaComponent::track(event, settings);
         assert_eq!(result.clone().is_err(), true);
         assert_eq!(
             result
