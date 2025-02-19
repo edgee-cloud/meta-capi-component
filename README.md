@@ -12,6 +12,10 @@
 
 <h1 align="center">Meta CAPI Component for Edgee</h1>
 
+[![Coverage Status](https://coveralls.io/repos/github/edgee-cloud/meta-capi-component/badge.svg)](https://coveralls.io/github/edgee-cloud/meta-capi-component)
+[![GitHub issues](https://img.shields.io/github/issues/edgee-cloud/meta-capi-component.svg)](https://github.com/edgee-cloud/meta-capi-component/issues)
+[![Edgee Component Registry](https://img.shields.io/badge/Edgee_Component_Registry-Public-green.svg)](https://www.edgee.cloud/edgee/meta-capi)
+
 This component implements the data collection protocol between [Edgee](https://www.edgee.cloud) and [Meta CAPI](https://developers.facebook.com/docs/marketing-api/conversions-api/).
 
 ## Quick Start

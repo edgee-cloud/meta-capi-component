@@ -31,3 +31,4 @@ target/
 # Specific
 meta_capi.wasm
 wasi_snapshot_preview1.reactor.wasm
+lcov.info
