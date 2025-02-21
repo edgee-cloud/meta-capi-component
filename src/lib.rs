@@ -2,7 +2,7 @@ mod meta_payload;
 
 use std::collections::HashMap;
 
-use crate::exports::edgee::protocols::data_collection::{
+use crate::exports::edgee::components::data_collection::{
     Data, Dict, EdgeeRequest, Event, Guest, HttpMethod,
 };
 use meta_payload::{parse_value, MetaEvent, MetaPayload};
