@@ -1,0 +1,37 @@
+manifest-version = 1
+
+[component]
+name = "Meta Capi"
+version = "0.7.0"
+category = "data-collection"
+subcategory = "analytics"
+description = """
+Meta Conversions API is designed to create a connection between an advertiser’s marketing data (such as website events) and Meta systems that optimize ad targeting, decrease cost per result and measure outcomes.
+Each event you send to Meta CAPI must have a user property (at least one of the following: email, phone_number), otherwise the event will be ignored.
+"""
+documentation = "https://www.edgee.cloud/docs/components/data-collection/meta-capi"
+repository = "https://github.com/edgee-cloud/meta-capi-component"
+wit-world-version = "0.4.0"
+
+[component.build]
+command = "cargo build --target wasm32-wasip2 --release && cp ./target/wasm32-wasip2/release/meta_capi_component.wasm meta_capi.wasm"
+output_path = "meta_capi.wasm"
+
+[component.settings.meta_pixel_id]
+title = "Meta Pixel ID"
+type = "string"
+required = true
+description = "The pixel ID for your Meta account"
+
+[component.settings.meta_access_token]
+title = "Meta Access Token"
+type = "string"
+required = true
+description = "The access token for your Meta account"
+
+[component.settings.meta_test_event_code]
+title = "Meta Test Event Code (optional)"
+type = "string"
+required = false
+description = "The test event code for your Meta account"
+
