@@ -4,7 +4,7 @@ manifest-version = 1
 name = "Meta Capi"
 version = "0.8.0"
 category = "data-collection"
-subcategory = "analytics"
+subcategory = "conversion-api"
 description = """
 Meta Conversions API is designed to create a connection between an advertiser’s marketing data (such as website events) and Meta systems that optimize ad targeting, decrease cost per result and measure outcomes.
 Each event you send to Meta CAPI must have a user property (at least one of the following: email, phone_number), otherwise the event will be ignored.
