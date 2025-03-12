@@ -11,8 +11,9 @@ Each event you send to Meta CAPI must have a user property (at least one of the 
 """
 documentation = "https://www.edgee.cloud/docs/components/data-collection/meta-capi"
 repository = "https://github.com/edgee-cloud/meta-capi-component"
-wit-world-version = "0.5.0"
+wit-version = "1.0.0"
 icon-path = "meta.png"
+language = "Rust"
 
 [component.build]
 command = "cargo build --target wasm32-wasip2 --release && cp ./target/wasm32-wasip2/release/meta_capi_component.wasm meta_capi.wasm"
