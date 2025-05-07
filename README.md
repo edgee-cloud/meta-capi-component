@@ -51,20 +51,6 @@ User events in Meta CAPI serve multiple purposes:
 - Enriches subsequent Page and Track events with user data
 - Enables proper user attribution across sessions
 
-**BE CAREFUL:**
-Meta Conversions API is designed to create a connection between an advertiser’s marketing data (such as website events) and Meta systems that optimize ad targeting, decrease cost per result and measure outcomes.
-Each event you send to Meta CAPI must have a user property (at least one of the following: `email`, `phone_number`), otherwise the event will be ignored.
-
-Here is an example of a user call:
-```javascript
-edgee.user({
-  user_id: "123",
-  properties: {
-    email: "john.doe@example.com",
-  },
-});
-```
-
 ## Configuration Options
 
 ### Basic Configuration
@@ -87,32 +73,6 @@ settings.edgee_page_event_enabled = true   # Enable/disable page view tracking
 settings.edgee_track_event_enabled = true  # Enable/disable custom event tracking
 settings.edgee_user_event_enabled = true   # Enable/disable user identification
 ```
-
-### Consent Management
-Before sending events to Meta CAPI, you can set the user consent using the Edgee SDK: 
-```javascript
-edgee.consent("granted");
-```
-
-Or using the Data Layer:
-```html
-<script id="__EDGEE_DATA_LAYER__" type="application/json">
-  {
-    "data_collection": {
-      "consent": "granted"
-    }
-  }
-</script>
-```
-
-If the consent is not set, the component will use the default consent status.
-**Important:** Meta CAPI requires the consent status to be set to `granted`. If not, the events will be ignored.
-
-| Consent | Events |
-|---------|--------|
-| pending | ignored |
-| denied  | ignored |
-| granted | forwarded |
 
 ## Development
 

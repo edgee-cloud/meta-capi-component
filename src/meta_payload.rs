@@ -3,7 +3,7 @@ use serde::Serialize;
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 
-use crate::exports::edgee::components::data_collection::{Consent, Data, Dict, Event};
+use crate::exports::edgee::components::data_collection::{Data, Dict, Event};
 
 #[derive(Serialize, Debug, Default)]
 pub(crate) struct MetaPayload {
@@ -155,17 +155,6 @@ impl MetaEvent {
             user_properties = data.properties.clone();
         }
 
-        if edgee_event.consent.is_some() && edgee_event.consent.unwrap() != Consent::Granted {
-            // Consent is not granted, so we don't send the event
-            return Err(anyhow!("Consent is not granted"));
-        }
-
-        // user properties
-        // You must provide at least one of the following user property.
-        if user_properties.is_empty() {
-            return Err(anyhow!("User properties are empty"));
-        }
-
         // Set user properties
         for (key, value) in user_properties.iter() {
             match key.as_str() {
@@ -183,13 +172,6 @@ impl MetaEvent {
                     // do nothing
                 }
             }
-        }
-
-        // return error if user data doesn't have any user property
-        if user_data.email.is_none() && user_data.phone_number.is_none() {
-            return Err(anyhow!(
-                "User properties must contain email or phone_number"
-            ));
         }
 
         meta_event.user_data = user_data;
