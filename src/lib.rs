@@ -100,7 +100,7 @@ fn build_edgee_request(meta_payload: MetaPayload) -> EdgeeRequest {
     );
 
     let url = if let Some(test_code) = meta_payload.test_event_code.clone() {
-        format!("{}&test_event_code={}", url, test_code)
+        format!("{url}&test_event_code={test_code}")
     } else {
         url
     };
