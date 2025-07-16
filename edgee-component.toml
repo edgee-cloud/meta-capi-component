@@ -16,7 +16,7 @@ icon-path = "meta.png"
 language = "Rust"
 
 [component.build]
-command = "cargo build --target wasm32-wasip2 --release && cp ./target/wasm32-wasip2/release/meta_capi_component.wasm meta_capi.wasm"
+command = "cargo build --target wasm32-wasip2 --release && rm -f meta_capi.wasm && cp ./target/wasm32-wasip2/release/meta_capi_component.wasm meta_capi.wasm"
 output_path = "meta_capi.wasm"
 
 [component.settings.meta_pixel_id]
