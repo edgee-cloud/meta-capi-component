@@ -6,10 +6,6 @@ version = "1.1.0"
 category = "data-collection"
 subcategory = "conversion-api"
 description = """
-# Meta CAPI Component
-
-[https://www.edgee.cloud/edgee/meta-capi](https://www.edgee.cloud/edgee/meta-capi)
-
 ## Overview
 
 The **Meta Conversions API (CAPI)** component by Edgee enables server-to-server event tracking by sending your conversion data directly to Meta CAPI from the edge.
