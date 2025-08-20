@@ -6,8 +6,42 @@ version = "1.1.0"
 category = "data-collection"
 subcategory = "conversion-api"
 description = """
-Meta Conversions API is designed to create a connection between an advertiser’s marketing data (such as website events) and Meta systems that optimize ad targeting, decrease cost per result and measure outcomes.
-Each event you send to Meta CAPI must have a user property (at least one of the following: email, phone_number), otherwise the event will be ignored.
+## Overview
+
+The **Meta Conversions API (CAPI)** component by Edgee enables server-to-server event tracking by sending your conversion data directly to Meta CAPI from the edge.
+This method enhances data accuracy and reliability by bypassing browser limitations such as ad blockers and cookie restrictions, ensuring your marketing analytics remain precise.
+
+---
+
+## Key Features & Benefits
+
+### Features
+
+- **Server-to-Server Integration**: Forwards events directly to Meta Conversions API.
+- **Event Mapping**: Supports mapping of Edgee events to Meta CAPI events.
+- **User Identification**: Allows use of email, phone, and other identifiers.
+- **Edge Execution**: WebAssembly-based for fast, low-latency processing.
+- **Test Mode**: Validate event tracking without affecting live data.
+
+### Benefits
+
+- **Reliable Tracking**: Ensures accurate data despite browser-level limitations.
+- **Optimized Performance**: Low-latency processing close to the user.
+- **Simplified Compliance**: Easier data protection regulation adherence.
+- **Minimal Client-Side Load**: Less client-side logic to maintain.
+
+---
+
+## Use Cases
+
+- **Conversion Tracking**: Track conversions from Meta ad campaigns.
+- **Attribution Accuracy**: Improve attribution models and analytics.
+- **Ad Optimization**: Fine-tune targeting and campaign effectiveness.
+- **Privacy-Conscious Collection**: Gather data in environments with strict privacy requirements.
+
+---
+
+Additional resources: [Meta Conversions API](https://developers.facebook.com/docs/marketing-api/conversions-api/)
 """
 documentation = "https://www.edgee.cloud/docs/components/data-collection/meta-capi"
 repository = "https://github.com/edgee-cloud/meta-capi-component"
